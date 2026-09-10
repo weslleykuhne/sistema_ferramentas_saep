@@ -39,6 +39,18 @@ server.get('/produtos/:id', (req, res) => {
     });
 });
 
+server.get('/produtos/busca/:termo', (req, res) => {
+    const termoBusca = '%' +  req.params.termo;
+    const sql = 'SELECT * FROM produto WHERE nome LIKE ?';
+    connetion.query(sql, [`%${termoBusca}%`], (erro, resultados) => {
+        if (erro) {
+            res.status(500).json({ error: erro.menssage });
+        } 
+        return  res.json(resultados[0]);
+    });
+    
+});
+
 server.listen(3000,() => {
     console.log('Servidor rodando na porta 3000');
 });
