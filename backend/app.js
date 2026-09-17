@@ -80,7 +80,35 @@ server.post("/produtos", (req, res) => {
   }
   const sql =
     "INSERT INTO produto (id_categoria, nome, cor, textura, peso, unidade_medida, aplicacao, data_validade, estoque_minimo, estoque_atual, preco_unitario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  connetion.query(sql, [
+  connetion.query(
+    sql,
+    [
+      id_categoria,
+      nome,
+      cor,
+      textura,
+      peso,
+      unidade_medida,
+      aplicacao,
+      data_validade,
+      estoque_minimo,
+      estoque_atual,
+      preco_unitario,
+    ],
+    (erro, resultados) => {
+      if (erro) {
+        res.status(500).json({ error: erro.message });
+      }
+      return res.json({
+        message: "Produto cadastrado com sucesso!",
+        id_produto: resultados.insertId,
+      });
+    },
+  );
+});
+
+server.put("/produtos/:id", (req, res) => {
+  const {
     id_categoria,
     nome,
     cor,
@@ -91,16 +119,21 @@ server.post("/produtos", (req, res) => {
     data_validade,
     estoque_minimo,
     estoque_atual,
-    preco_unitario
-  ], (erro, resultados) => {
-    if (erro) {
-      res.status(500).json({ error: erro.message });
+    preco_unitario,
+  } = req.body;
+  const { id } = req.params;
+
+  const sql =
+    "UPDATE produto SET id_categoria = ?, nome = ?, cor = ?, textura = ?, peso = ?, unidade_medida = ?, aplicacao = ?, data_validade = ?, estoque_minimo = ?, estoque_atual = ?, preco_unitario = ? WHERE id_produto = ?";
+
+  connetion.query(sql, [id_categoria, nome, cor, textura, peso, unidade_medida, aplicacao, data_validade, estoque_minimo, estoque_atual,preco_unitario,id], 
+    (erro) => {
+      if(erro) {
+        res.status(500).json({ error: erro.message });
+      }
+      return res.json({ message: "Produto atualizado com sucesso!" });
     }
-    return res.json({
-      message: "Produto cadastrado com sucesso!",
-      id: resultados.insertId,
-    });
-  });
+  );
 });
 
 server.listen(5000, () => {
